@@ -1,0 +1,56 @@
+{
+    "lastBuildDate": "Sun, 30 May 2021 12:00:00 GMT",
+    "item": [
+        {
+            "uuid": "185fe326",
+            "title": "Links (69)",
+            "author": "Nintil",
+            "link": "https://nintil.com/links-69/",
+            "description": "Various topics are discussed including a review on the role of the microbiome and gut barrier dysfunction in aging, the availability of gene therapy in cream format, rationalists, DOE funding research in cold fusion, building a better NIH, Patrick Collison interviewing Sam Altman, a critique of a16z's State of Crypto report, treating sarcopenia with AAV, and the effects of ultrasound on mice's brains.",
+            "content": "",
+            "created_at": 1679940469,
+            "views": [
+                {
+                    "viewer": "Georg",
+                    "resonance": 90,
+                    "comment": "Liked it",
+                    "viewDate": "Sun, 30 May 2021 10:30:00 GMT"
+                }
+            ]
+        },
+        {
+            "uuid": "3aabb9dc",
+            "title": "Notes on end-to-end biology",
+            "author": "Nintil",
+            "link": "https://nintil.com/biology-llms/",
+            "description": "",
+            "content": "End-to-end biology, ML in drug discovery, AlphaFold's impact, self-driving car analogy, challenges in understanding biology and future implications for drug development. #biology #ML #drugdiscovery #AlphaFold #selfdrivingcars #understanding #challenges",
+            "created_at": 1679940469,
+            "views": [
+                {
+                    "viewer": "Georg",
+                    "resonance": 90,
+                    "comment": "Very curious, what do you think will be the actual impact?",
+                    "viewDate": "Sun, 30 May 2021 10:30:00 GMT"
+                }
+            ]
+        },
+        {
+            "uuid": "c2e156ab",
+            "title": "Bryan Johnson's Blueprint",
+            "author": "Nintil",
+            "link": "https://nintil.com/bryan-johnson-blueprint",
+            "description": "",
+            "content": "Bryan Johnson, founder of Braintree and Kernel recently (a year ago) embarked in what seems one of the most (or perhaps, the most) ambitious program to slow down (and attempt to reverse) aging: Blueprint.",
+            "created_at": 1679940469,
+            "views": [
+                {
+                    "viewer": "Georg",
+                    "resonance": 20,
+                    "comment": "Nah.",
+                    "viewDate": "Sun, 30 May 2021 10:30:00 GMT"
+                }
+            ]
+        }
+    ]
+}
