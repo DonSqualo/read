@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AllItemsContext } from './AllItemsContext';
 import { DragDropContext, Droppable, Draggable, DroppableProps } from "react-beautiful-dnd";
+import { useSwipeable } from 'react-swipeable';
 
 interface RSSFeedProps {
     feedUrl: string;
@@ -40,6 +41,7 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 } */
 const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
+    const [swipingX, setSwipingX] = useState({index: 0, value: 0});
     //const [feedItems, setFeedItems] = useState<MeaningItem[]>([]);
     /* useEffect(() => {
         const fetchFeed = async () => {
@@ -75,15 +77,13 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
 
     // THE whole drag and drop logic
 
-    const grid = 8;
-
-    const getItemStyle = (isDragging: any, draggableStyle: any) => ({
+    const getItemStyle = (_isDragging: any, draggableStyle: any) => ({
         padding: 0,
         // styles we need to apply on draggables
         ...draggableStyle
     });
 
-    const getListStyle = (isDraggingOver: any) => ({
+    const getListStyle = (_isDraggingOver: any) => ({
         /*background: isDraggingOver ? "lightblue" : "lightgrey",
         padding: grid,
         width: 250*/
@@ -110,8 +110,16 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
         setAllItems(newlySortedItems);
     }
 
+/*     const handlers = useSwipeable({
+        onSwiping: () => {console.log("hello")}
+    }); */
 
+    /* const bgImage = {
+        background: rgba(0, 0, 0, .65) url('https://res.cloudinary.com/deepwave-org/image/upload/c_scale,w_2000/v1680756160/Heye.earth/Projects/withmeaning/withmeaning_mfwwc7.webp');
+        background-blend-mode: darken;
 
+         (swipingX.index == index ? - swipingX.value : 0) + "px"
+    }; */
 
     return (
         <div className="space-y-1">
@@ -140,23 +148,37 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                                                     setCurrentItem(index);
                                                     window.scrollTo(0, 0);
                                                 }}>
-                                                    <div
-                                                        className={`flex p-4 pl-8 border-b border-primary-100 cursor-pointer ${index < currentItem ? 'opacity-20' : ''}`}
+                                                    <div style={{ background: 'rgba(0, 0, 0, .65) url("https://res.cloudinary.com/deepwave-org/image/upload/c_scale,w_2000/v1680756160/Heye.earth/Projects/withmeaning/withmeaning_mfwwc7.webp")', 
+                                                    backgroundBlendMode: "darken", 
+                                                    backgroundSize: "200%",
+                                                    backgroundPosition: (swipingX.index == index ? 
+                                                        (
+                                                            swipingX.value > (window.outerWidth / 1.5) ? window.outerWidth / 1.3 : 
+                                                                swipingX.value < (- window.outerWidth / 1.6) ? 50 : 
+                                                                    (- swipingX.value / 1.5) + (swipingX.value > 0 ? window.outerWidth * 1.2 : - window.outerWidth / 3)
+                                                        )
+                                                        : 0) + "px"}}>
+
+                                                    <div {...useSwipeable({onSwiping: (e) => {setSwipingX({index: index, value: e.deltaX})}, onSwiped: () => {setSwipingX({index: index, value: 0})}})}
+                                                        className={`flex bg-secondary p-4 pl-8 border-b border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''}`}
+                                                        style={{ transform: "translateX(" + (swipingX.index == index ? swipingX.value : 0) + "px)"}}
                                                     >
-                                                        <div className='self-center h-full mr-3 pr-2'>
+                                                        <div className='self-center h-full mr-4'>
                                                             <img
                                                                 src="https://nintil.com/favicon-32x32.png" // this should be replaces by an icon, according to the type of item (read, watch, tweet, etc)                                alt="Round Image"
                                                                 className="w-8 h-8 rounded-full object-cover"
                                                             />
                                                         </div>
-                                                        <div className='max-w-[80%]'>
-                                                            <h2 className="text-2xl font-semibold">
+                                                        <div className='max-w-[80%] mt-2'>
+                                                            <h2 className="text-xl font-semibold leading-3">
                                                                 {item.title}
                                                             </h2>
-                                                            <span className='text-xl'>
+                                                            <span className='text-base'>
                                                                 <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'>recommended by</span> {item.views[0]?.viewer}
                                                             </span>
                                                         </div>
+                                                    </div>
+                                                    
                                                     </div>
                                                 </Link>
                                             </div>

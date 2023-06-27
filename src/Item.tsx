@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AllItemsContext } from "./AllItemsContext";
 import { useSwipeable } from "react-swipeable";
 import { useNavigate } from "react-router-dom";
