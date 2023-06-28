@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AllItemsContext } from './AllItemsContext';
+import { AuthContext } from './AuthContext';
 import { DragDropContext, Droppable, Draggable, DroppableProps } from "react-beautiful-dnd";
 import { useSwipeable } from 'react-swipeable';
+import NewItem from './NewItem';
 
 interface RSSFeedProps {
     feedUrl: string;
@@ -42,6 +44,8 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
     const [swipingX, setSwipingX] = useState({index: 0, value: 0});
+    const { authToken, refreshCount } = useContext(AuthContext);
+
     //const [feedItems, setFeedItems] = useState<MeaningItem[]>([]);
     /* useEffect(() => {
         const fetchFeed = async () => {
@@ -66,14 +70,29 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
     useEffect(() => {
         const getJSON = async () => {
             try {
-                const response = await fetch("https://example-json-stream.accounts8547.workers.dev/").then((response) => response.text());
+                const headers = new Headers();
+                headers.append("auth_token", authToken);
+            
+                const requestOptions = {
+                    method: "GET",
+                    headers: headers,
+                };
+            
+                const response = await fetch("http://localhost:8080/get_items", requestOptions).then((response) => response.text());
+                console.log(JSON.parse(response).items)
                 setAllItems(JSON.parse(response).items)
             } catch (error) {
                 console.error("Error fetching JSON feed:", error);
             }
+            /* try {
+                const response = await fetch("https://example-json-stream.accounts8547.workers.dev/").then((response) => response.text());
+                setAllItems(JSON.parse(response).items)
+            } catch (error) {
+                console.error("Error fetching JSON feed:", error);
+            } */
         }
         getJSON();
-    }, [feedUrl])
+    }, [feedUrl, refreshCount]) // here I can add a thing if "submitted new item, or changed order has happened"
 
     // THE whole drag and drop logic
 
@@ -174,7 +193,7 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                                                                 {item.title}
                                                             </h2>
                                                             <span className='text-base'>
-                                                                <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'>recommended by</span> {item.views[0]?.viewer}
+                                                                <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'></span> {/* recommended by</span> {item.views[0]?.viewer} */}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -191,6 +210,7 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                     )}
                 </StrictModeDroppable>
             </DragDropContext>
+            <NewItem />
         </div>
     );
 

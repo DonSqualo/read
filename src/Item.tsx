@@ -31,8 +31,8 @@ const Item = () => {
         onSwipedRight: swipedRight,
         onSwipedDown: swipedDown,
     });
-
-    var date = new Date(allItems[currentItem]?.created_at * 1000)
+    
+    var date = allItems[currentItem]?.created_at // should be an actual Date newDate().toDateString()
     return (
         <>
 
@@ -46,9 +46,9 @@ const Item = () => {
                     <div className="text-right w-full mb-5 self-end text-primary">
                         <div onClick={() => {setHidden(!isHidden)}}>{isHidden ? "i" : "v"}</div>
                         <div className={`${isHidden ? "hidden" : ''}`}>
-                        {date.toDateString()}<br></br>
-                        <span className="opacity-60">From</span> {allItems[currentItem]?.views[0].viewer}: {allItems[currentItem]?.views[0].comment} 
-                        </div>
+                        {date}<br></br>
+{/*                         <span className="opacity-60">From</span> {allItems[currentItem]?.views[0].viewer}: {allItems[currentItem]?.views[0].comment} 
+ */}                        </div>
                     </div>
                 </div>
                 <iframe className="mx-auto -my-3 h-screen"

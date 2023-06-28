@@ -1,16 +1,11 @@
 import { Dispatch, ReactElement, SetStateAction, createContext, useMemo, useState } from "react";
 import { Item } from 'rss-parser';
-interface Viewed {
-    viewer: string;
-    resonance: number;
-    comment: string
-}
+
 interface MeaningItem extends Item {
     author: string;
     imgURL: string;
     recommendedBy: string;
     uid: string;
-    views: Viewed[]
     created_at: number;
 }
 
