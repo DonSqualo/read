@@ -3,10 +3,11 @@ import { Item } from 'rss-parser';
 
 interface MeaningItem extends Item {
     author: string;
-    imgURL: string;
-    recommendedBy: string;
     uid: string;
     created_at: number;
+    type: string;
+    done?: boolean;
+    archived?: boolean;
 }
 
 export interface ItemsContext {

@@ -13,7 +13,7 @@ interface Item {
 }
 
 const NewItem = () => {
-    const [formExpanded, setFormExpanded] = useState<bool>(false);
+    const [formExpanded, setFormExpanded] = useState<boolean>(false);
     const [formInput, setFormInput] = useState<Item>({title: "", author: "me", content: "", summary: "", link: "", type: "read"});
     const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
 
@@ -21,7 +21,7 @@ const NewItem = () => {
         setFormExpanded(!formExpanded)
         console.log("d")
       };
-    const addItem = async (formInput) => {
+    const addItem = async (formInput: any) => {
         try {
             const headers = new Headers();
             headers.append("auth_token", authToken);
@@ -43,12 +43,12 @@ const NewItem = () => {
         }
     }
     const handleSubmit = () => {
-        event.preventDefault();
+        event?.preventDefault();
         console.log(formInput)
         addItem(formInput);
       };
       
-    const handleChange = (e) => {
+    const handleChange = (e: any) => {
         setFormInput({
             ...formInput,     // spread the existing state
             [e.target.name]: e.target.value   // update only the field that changes

@@ -4,7 +4,14 @@ import doneIcon from '../assets/icons8-tick-box_done.svg'
 import doGif from '../assets/icons8-tick-box.gif'
 import undoGif from '../assets/icons8-tick-box_undo.gif'
 import { useEffect, useState } from 'react'
-const Icon = ({type, state, size}) => {
+
+interface IconProps {
+    type: string;
+    state: boolean;
+    size: number;
+  }
+
+const Icon: React.FC<IconProps> = ({ type, state, size }) => {
 
     var imgSrc = "";
     const [animate, setAnimate] = useState(false);
@@ -15,29 +22,11 @@ const Icon = ({type, state, size}) => {
            break; 
         } 
         case "do": {
-            switch (state) {
-                case 0:
-                    imgSrc = doIcon
-                    break;
-                case 1:
+            if (state) {
                     imgSrc = doneIcon
-                    break;
-                default:
-                    break;
-            }
-            //imgSrc = doIcon
-            /* 
-            switch (state) {
-                case 0:
+                } else {
                     imgSrc = doIcon
-                    break;
-                case 1:
-                    imgSrc = doneIcon
-                    break;
-                default:
-                    imgSrc = doIcon
-                    break;
-            } */
+                }
            break; 
         } 
         default: { 

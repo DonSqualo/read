@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AllItemsContext } from './AllItemsContext';
 import { AuthContext } from './AuthContext';
@@ -138,14 +138,12 @@ const Stream = () => {
         
         return result;
     };
-
+    interface orderItem {
+        order: number,
+        uid: string,
+    }
     interface Order {
-        items: [
-            {
-                order: number,
-                uid: string,
-            }
-        ]
+        items: Array<orderItem>
     }
     const order = async (order: Order) => {
         try {
@@ -159,8 +157,8 @@ const Stream = () => {
                 body: JSON.stringify(order),
             };
         
-            const response = await fetch(backendPath + "/order", requestOptions).then(
-                setRefreshCount(refreshCount + 1));
+            await fetch(backendPath + "/order", requestOptions)
+            setRefreshCount((refreshCount: number) => refreshCount + 1);
         } catch (error) {
             console.error("Error ordering items", error);
         }
@@ -176,18 +174,18 @@ const Stream = () => {
             result.destination.index
         );
         var orderedArray: Order = {items: 
-            newlySortedItems.map((element, index) => ({order: index, uid: element.uid}))
+            newlySortedItems.map((element: any, index) => ({order: index, uid: element.uid}))
         };
         
         /* allItems.map
         orderedArray.items.push({order: 2, uid: ""}) */
         
-        console.log(orderedArray)
+        console.log(allItems[0].done)
         setAllItems(newlySortedItems)
         order(orderedArray)
     }
 
-    const markDone = async (index, bool) => {
+    const markDone = async (index: number, bool: boolean) => {
         try {
             const headers = new Headers();
             headers.append("auth_token", authToken);
@@ -202,8 +200,8 @@ const Stream = () => {
                 }),
             };
         
-            const response = await fetch(backendPath + "/done", requestOptions).then(
-                setRefreshCount(refreshCount + 1));
+            await fetch(backendPath + "/done", requestOptions)
+            setRefreshCount(refreshCount + 1);
         } catch (error) {
             console.error("Error marking item as done", error);
         }
@@ -215,20 +213,15 @@ const Stream = () => {
         } */
     }
 
-    const handleDone = (index, done) => {
-        switch (done) {
-            case 0:
-                markDone(index, true)
-                break;
-            case 1:
-                markDone(index, false)
-                break;
-            default:
-                break;
+    const handleDone = (index: number, done: boolean) => {
+        if (done) {
+            markDone(index, false)
+        } else {
+            markDone(index, true)
         }
     }
 
-    const archive = async (index, bool) => {
+    const archive = async (index: number, bool: boolean) => {
         try {
             const headers = new Headers();
             headers.append("auth_token", authToken);
@@ -243,13 +236,13 @@ const Stream = () => {
                 }),
             };
         
-            const response = await fetch(backendPath + "/archive", requestOptions).then(
-                setRefreshCount(refreshCount + 1));
+            await fetch(backendPath + "/archive", requestOptions)
+            setRefreshCount(refreshCount + 1);
         } catch (error) {
             console.error("Error marking item as archived", error);
         }
     }
-    const handleOnSwiped = (event, index) => {
+    const handleOnSwiped = (event: any, index: number) => {
         if (event.deltaX > 100) {
             console.log("later")
         }
@@ -320,8 +313,8 @@ const Stream = () => {
                                                         style={{ transform: "translateX(" + (swipingX.index == index ? swipingX.value : 0) + "px)"}}
                                                     >
                                                         <div className='flex items-center mr-4'>
-                                                            <button onClick={() => {handleDone(index, item.done)}}>
-                                                                <Icon type={item.type} state={item.done} size={8}/>
+                                                            <button onClick={() => {handleDone(index, item.done || false)}}>
+                                                                <Icon type={item.type} state={item.done || false} size={8}/>
                                                             </button>
                                                         </div>
                                                         <Link to={`/item/${item.uid}`} state={item} onClick={() => {

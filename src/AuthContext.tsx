@@ -2,7 +2,7 @@ import { Dispatch, ReactElement, SetStateAction, createContext, useMemo, useStat
 
 export interface AuthTokenContext {
     authToken: string;
-    setAllItems: Dispatch<SetStateAction<any>>,
+    setAuthToken: Dispatch<SetStateAction<any>>,
     refreshCount: number;
     setRefreshCount: Dispatch<SetStateAction<any>>,
 }
@@ -18,8 +18,8 @@ export const AuthContext = createContext(AuthContextInitialState);
 
 
 export function AuthProvider ({ children }: {children: ReactElement}) {
-	const [authToken, setAuthToken] = useState<string>(null);
-	const [refreshCount, setRefreshCount] = useState<number>(null);
+	const [authToken, setAuthToken] = useState<any>(null);
+	const [refreshCount, setRefreshCount] = useState<any>(null);
     const authContext = useMemo(
 		() => ({ authToken, setAuthToken, refreshCount, setRefreshCount }),
 		[authToken, refreshCount]

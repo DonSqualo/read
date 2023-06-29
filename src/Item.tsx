@@ -34,7 +34,7 @@ const Item = () => {
     // THIS SHOULD BE REFACTORED, away from duplicate in bot Item and Stream, mabe into Icon ? or as a helper class
     // mainly because "refreshCount" actually doesn't propagate back to the useEffect Hook of Stream
 
-    const markDone = async (index, bool) => {
+    const markDone = async (index: number, bool: boolean) => {
         try {
             const headers = new Headers();
             headers.append("auth_token", authToken);
@@ -48,8 +48,8 @@ const Item = () => {
                     "done": bool,
                 }),
             };
-            const response = await fetch(backendPath + "/done", requestOptions).then(
-                setRefreshCount(refreshCount + 1));
+            await fetch(backendPath + "/done", requestOptions)
+            setRefreshCount(refreshCount + 1)
             
         } catch (error) {
             console.error("Error marking item as done", error);
@@ -62,17 +62,11 @@ const Item = () => {
         } */
     }
 
-    const handleDone = (index, done) => {
-        console.log(index, done)
-        switch (done) {
-            case 0:
-                markDone(index, true)
-                break;
-            case 1:
-                markDone(index, false)
-                break;
-            default:
-                break;
+    const handleDone = (index: number, done: boolean) => {
+        if (done) {
+            markDone(index, false)
+        } else {
+            markDone(index, true)
         }
     }
 
@@ -96,8 +90,8 @@ const Item = () => {
                         <h1 className="text-5xl py-4">{allItems[currentItem]?.title}</h1>
                         {allItems[currentItem]?.author ? <div className="text-xl pb-4"><span className="opacity-60">By</span> {allItems[currentItem]?.author}</div> : ""}
                         {(allItems[currentItem]?.type == "do") ? 
-                        <button onClick={() => {handleDone(currentItem, allItems[currentItem]?.done)}} className="w-full flex justify-center">
-                            <Icon type={allItems[currentItem]?.type} state={allItems[currentItem]?.done} size={12}/>
+                        <button onClick={() => {handleDone(currentItem, allItems[currentItem]?.done || false)}} className="w-full flex justify-center">
+                            <Icon type={allItems[currentItem]?.type} state={allItems[currentItem]?.done || false} size={12}/>
                         </button>
                         : ""}
                     </div>

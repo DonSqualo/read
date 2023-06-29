@@ -9,10 +9,10 @@ const signIn = () => {
 
   const handleSubmit = () => {
     setAuthToken(formInput);
-    event.preventDefault();
+    event?.preventDefault();
     navigate('/stream');
   };
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setFormInput(event.target.value);
   }
 

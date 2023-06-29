@@ -5,7 +5,6 @@ import Item from './Item';
 
 
 function App() {
-  const feedUrl = 'https://nintil.com/rss.xml';
   return (
     <>
       <div className="flex justify-center items-center min-w-full min-h-screen theme-dark-night bg-secondary overflow-hidden">
