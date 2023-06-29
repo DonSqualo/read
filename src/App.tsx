@@ -12,7 +12,7 @@ function App() {
         <div className='w-full max-w-6xl mx-auto text-primary'>
           <Routes>
             <Route path="/" element={<SignIn />} />
-            <Route path="stream" element={<Stream feedUrl={feedUrl} />} />
+            <Route path="/stream" element={<Stream />} />
             <Route path="/item/:id" element={<Item />} />
           </Routes>
         </div>

@@ -27,7 +27,7 @@ export const AllItemsContext = createContext(allItemsContextInitialState);
 
 export function AllItemsProvider({ children }: {children: ReactElement}) {
 	const [allItems, setAllItems] = useState<any>(null);
-	const [currentItem, setCurrentItem] = useState<any>(null);
+	const [currentItem, setCurrentItem] = useState<any>(0);
     const userContext = useMemo(
 		() => ({ allItems, setAllItems, currentItem, setCurrentItem }),
 		[allItems, currentItem]

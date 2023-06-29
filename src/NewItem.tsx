@@ -1,5 +1,7 @@
 import {useState, useContext} from 'react'
 import { AuthContext } from './AuthContext';
+import {backendPath} from "./consts/constants.ts"
+
 
 interface Item {
     title: string
@@ -33,7 +35,7 @@ const NewItem = () => {
                 body: JSON.stringify(formInput),
             };
         
-            await fetch("http://localhost:8080/add_item", requestOptions);
+            await fetch(backendPath + "/add_item", requestOptions);
             setRefreshCount(refreshCount + 1)
             
         } catch (error) {

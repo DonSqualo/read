@@ -5,10 +5,12 @@ import { AuthContext } from './AuthContext';
 import { DragDropContext, Droppable, Draggable, DroppableProps } from "react-beautiful-dnd";
 import { useSwipeable } from 'react-swipeable';
 import NewItem from './NewItem';
+import Icon from './components/Icon';
+import archiveGif from './assets/icons8-verified-scroll.gif'
+import laterGif from './assets/icons8-time.gif'
+import { useNavigate } from "react-router-dom";
+import {backendPath} from "./consts/constants.ts";
 
-interface RSSFeedProps {
-    feedUrl: string;
-}
 
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
     const [enabled, setEnabled] = useState(false);
@@ -41,10 +43,11 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
     recommendedBy: string;
     uid: string;
 } */
-const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
+const Stream = () => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
     const [swipingX, setSwipingX] = useState({index: 0, value: 0});
-    const { authToken, refreshCount } = useContext(AuthContext);
+    const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     //const [feedItems, setFeedItems] = useState<MeaningItem[]>([]);
     /* useEffect(() => {
@@ -78,9 +81,18 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                     headers: headers,
                 };
             
-                const response = await fetch("http://localhost:8080/get_items", requestOptions).then((response) => response.text());
-                console.log(JSON.parse(response).items)
-                setAllItems(JSON.parse(response).items)
+                const response = await fetch(backendPath + "/get_items", requestOptions);
+                const responseData = await response.text();
+                const items = JSON.parse(responseData).items
+                setAllItems(items)
+                /* if (response) {
+                    if (!refreshCount) {
+                        setRefreshCount(1)
+                        navigate('/item/' + allItems[0].uid)
+                    }
+                    else {
+                        console.log(refreshCount, "Hello")
+                    } */
             } catch (error) {
                 console.error("Error fetching JSON feed:", error);
             }
@@ -92,8 +104,17 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
             } */
         }
         getJSON();
-    }, [feedUrl, refreshCount]) // here I can add a thing if "submitted new item, or changed order has happened"
+        
+    }, [refreshCount]) // here I can add a thing if "submitted new item, or changed order has happened"
 
+    useEffect(() => {
+        if (allItems && !refreshCount) {
+            //setCurrentItem(currentItem)
+            //console.log(allItems[currentItem])
+            setRefreshCount(1)
+            navigate('/item/' + allItems[currentItem].uid)
+        }
+    }, [allItems])
     // THE whole drag and drop logic
 
     const getItemStyle = (_isDragging: any, draggableStyle: any) => ({
@@ -108,14 +129,42 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
         width: 250*/
     });
 
+    
     const reorder = (list: any, startIndex: any, endIndex: any) => {
         const result = Array.from(list);
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
-
+        
+        
         return result;
     };
 
+    interface Order {
+        items: [
+            {
+                order: number,
+                uid: string,
+            }
+        ]
+    }
+    const order = async (order: Order) => {
+        try {
+            const headers = new Headers();
+            headers.append("auth_token", authToken);
+            headers.append("Accept", 'application/json');
+            headers.append("Content-Type", 'application/json');
+            const requestOptions = {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(order),
+            };
+        
+            const response = await fetch(backendPath + "/order", requestOptions).then(
+                setRefreshCount(refreshCount + 1));
+        } catch (error) {
+            console.error("Error ordering items", error);
+        }
+    }
     function onDragEnd(result: any): void {
         // dropped outside the list
         if (!result.destination) {
@@ -126,7 +175,89 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
             result.source.index,
             result.destination.index
         );
-        setAllItems(newlySortedItems);
+        var orderedArray: Order = {items: 
+            newlySortedItems.map((element, index) => ({order: index, uid: element.uid}))
+        };
+        
+        /* allItems.map
+        orderedArray.items.push({order: 2, uid: ""}) */
+        
+        console.log(orderedArray)
+        setAllItems(newlySortedItems)
+        order(orderedArray)
+    }
+
+    const markDone = async (index, bool) => {
+        try {
+            const headers = new Headers();
+            headers.append("auth_token", authToken);
+            headers.append("Accept", 'application/json');
+            headers.append("Content-Type", 'application/json');
+            const requestOptions = {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify({
+                    "uid": allItems[index]["uid"],
+                    "done": bool,
+                }),
+            };
+        
+            const response = await fetch(backendPath + "/done", requestOptions).then(
+                setRefreshCount(refreshCount + 1));
+        } catch (error) {
+            console.error("Error marking item as done", error);
+        }
+        /* try {
+            const response = await fetch("https://example-json-stream.accounts8547.workers.dev/").then((response) => response.text());
+            setAllItems(JSON.parse(response).items)
+        } catch (error) {
+            console.error("Error fetching JSON feed:", error);
+        } */
+    }
+
+    const handleDone = (index, done) => {
+        switch (done) {
+            case 0:
+                markDone(index, true)
+                break;
+            case 1:
+                markDone(index, false)
+                break;
+            default:
+                break;
+        }
+    }
+
+    const archive = async (index, bool) => {
+        try {
+            const headers = new Headers();
+            headers.append("auth_token", authToken);
+            headers.append("Accept", 'application/json');
+            headers.append("Content-Type", 'application/json');
+            const requestOptions = {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify({
+                    "uid": allItems[index]["uid"],
+                    "archived": bool,
+                }),
+            };
+        
+            const response = await fetch(backendPath + "/archive", requestOptions).then(
+                setRefreshCount(refreshCount + 1));
+        } catch (error) {
+            console.error("Error marking item as archived", error);
+        }
+    }
+    const handleOnSwiped = (event, index) => {
+        if (event.deltaX > 100) {
+            console.log("later")
+        }
+        if (event.deltaX < -100) {
+            console.log(!allItems[index]?.archived)
+            archive(index, !allItems[index]?.archived)
+        }
+        setSwipingX({index: index, value: 0})
     }
 
 /*     const handlers = useSwipeable({
@@ -158,15 +289,12 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
-                                                className='select-none w-full- p-8 text-3xl'
+                                                className='select-none w-full relative p-8 text-3xl'
                                                 style={getItemStyle(
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                <Link to={`/item/${item.uid}`} state={item} onClick={() => {
-                                                    setCurrentItem(index);
-                                                    window.scrollTo(0, 0);
-                                                }}>
+                                                
                                                     <div style={{ background: 'rgba(0, 0, 0, .65) url("https://res.cloudinary.com/deepwave-org/image/upload/c_scale,w_2000/v1680756160/Heye.earth/Projects/withmeaning/withmeaning_mfwwc7.webp")', 
                                                     backgroundBlendMode: "darken", 
                                                     backgroundSize: "200%",
@@ -177,29 +305,43 @@ const Stream: React.FC<RSSFeedProps> = ({ feedUrl }) => {
                                                                     (- swipingX.value / 1.5) + (swipingX.value > 0 ? window.outerWidth * 1.2 : - window.outerWidth / 3)
                                                         )
                                                         : 0) + "px"}}>
-
-                                                    <div {...useSwipeable({onSwiping: (e) => {setSwipingX({index: index, value: e.deltaX})}, onSwiped: () => {setSwipingX({index: index, value: 0})}})}
-                                                        className={`flex bg-secondary p-4 pl-8 border-b border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''}`}
+                                                            <div className="absolute w-full h-full flex justify-between items-center">
+                                                            <div className="pl-6 pt-1 flex justify-center items-center flex-col">
+                                                                    <img src={laterGif} className="invert mix-blend-lighten h-8 w-8" />
+                                                                    <div className="text-lg">Later</div>
+                                                                    </div>
+                                                                <div className="pr-6 pt-1 flex justify-center items-center flex-col">
+                                                                    <img src={archiveGif} className="invert mix-blend-lighten h-8 w-8" />
+                                                                    <div className="text-lg">Archive</div>
+                                                                    </div>
+                                                            </div>
+                                                    <div {...useSwipeable({onSwiping: (e) => {setSwipingX({index: index, value: e.deltaX})}, onSwiped: (e) => {handleOnSwiped(e, index)}})}
+                                                        className={`flex bg-secondary p-6 pl-8 border-b border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''} ${allItems[index]?.done ? 'text-primary-100' : ''}`}
                                                         style={{ transform: "translateX(" + (swipingX.index == index ? swipingX.value : 0) + "px)"}}
                                                     >
-                                                        <div className='self-center h-full mr-4'>
-                                                            <img
-                                                                src="https://nintil.com/favicon-32x32.png" // this should be replaces by an icon, according to the type of item (read, watch, tweet, etc)                                alt="Round Image"
-                                                                className="w-8 h-8 rounded-full object-cover"
-                                                            />
+                                                        <div className='flex items-center mr-4'>
+                                                            <button onClick={() => {handleDone(index, item.done)}}>
+                                                                <Icon type={item.type} state={item.done} size={8}/>
+                                                            </button>
                                                         </div>
-                                                        <div className='max-w-[80%] mt-2'>
-                                                            <h2 className="text-xl font-semibold leading-3">
+                                                        <Link to={`/item/${item.uid}`} state={item} onClick={() => {
+                                                    setCurrentItem(index);
+                                                    window.scrollTo(0, 0);
+                                                }} className="w-full">
+                                                        <div className='max-w-[80%] pt-1'>
+                                                            <h2 className="text-xl font-semibold">
                                                                 {item.title}
                                                             </h2>
-                                                            <span className='text-base'>
+                                                            {item.author ? 
+                                                            <div className='text-base'>
                                                                 <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'></span> {/* recommended by</span> {item.views[0]?.viewer} */}
-                                                            </span>
+                                                            </div> : ""}
                                                         </div>
+                                                        
+                                                </Link>
                                                     </div>
                                                     
                                                     </div>
-                                                </Link>
                                             </div>
                                         )}
                                     </Draggable>
