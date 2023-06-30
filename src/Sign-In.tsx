@@ -1,14 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from './AuthContext';
+import Cookies from 'js-cookie';
 
 const signIn = () => {
   const navigate = useNavigate();
   const [formInput, setFormInput] = useState('');
-  const { setAuthToken } = useContext(AuthContext);
+  const { authToken, setAuthToken } = useContext(AuthContext);
+  useEffect(() => {
+    if (authToken) {
+      navigate('/stream');
+    }
+})
+  
 
   const handleSubmit = () => {
     setAuthToken(formInput);
+    Cookies.set('meaning_user_key', formInput, { expires: 7 })
     event?.preventDefault();
     navigate('/stream');
   };

@@ -1,4 +1,5 @@
-import { Dispatch, ReactElement, SetStateAction, createContext, useMemo, useState } from "react";
+import { Dispatch, ReactElement, SetStateAction, createContext, useMemo, useState, useEffect } from "react";
+import Cookies from 'js-cookie';
 
 export interface AuthTokenContext {
     authToken: string;
@@ -24,6 +25,17 @@ export function AuthProvider ({ children }: {children: ReactElement}) {
 		() => ({ authToken, setAuthToken, refreshCount, setRefreshCount }),
 		[authToken, refreshCount]
 	);
-
+    useEffect(() => {
+        const key = Cookies.get('meaning_user_key')
+        if (!key) {
+          // redirect user back to login page, 
+          // or handle the missing key error in some other ways
+          navigate("/");
+        }
+        else {
+            console.log(key)
+            setAuthToken(key);
+        }
+    }, [])
     return <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>;
 }

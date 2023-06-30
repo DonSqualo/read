@@ -10,7 +10,7 @@ import archiveGif from './assets/icons8-verified-scroll.gif'
 import laterGif from './assets/icons8-time.gif'
 import { useNavigate } from "react-router-dom";
 import {backendPath} from "./consts/constants.ts";
-
+import Cookies from 'js-cookie';
 
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
     const [enabled, setEnabled] = useState(false);
@@ -46,9 +46,21 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 const Stream = () => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
     const [swipingX, setSwipingX] = useState({index: 0, value: 0});
-    const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
+    const { authToken, setAuthToken, refreshCount, setRefreshCount } = useContext(AuthContext);
     const navigate = useNavigate();
 
+/*     useEffect(() => {
+        const key = Cookies.get('meaning_user_key')
+        if (!key) {
+          // redirect user back to login page, 
+          // or handle the missing key error in some other ways
+          navigate("/");
+        }
+        else {
+            console.log(key)
+           setAuthToken(key);
+        }
+    }, []) */
     //const [feedItems, setFeedItems] = useState<MeaningItem[]>([]);
     /* useEffect(() => {
         const fetchFeed = async () => {
@@ -70,42 +82,6 @@ const Stream = () => {
         };
         fetchFeed();
     }, [feedUrl]); */
-    useEffect(() => {
-        const getJSON = async () => {
-            try {
-                const headers = new Headers();
-                headers.append("auth_token", authToken);
-            
-                const requestOptions = {
-                    method: "GET",
-                    headers: headers,
-                };
-            
-                const response = await fetch(backendPath + "/get_items", requestOptions);
-                const responseData = await response.text();
-                const items = JSON.parse(responseData).items
-                setAllItems(items)
-                /* if (response) {
-                    if (!refreshCount) {
-                        setRefreshCount(1)
-                        navigate('/item/' + allItems[0].uid)
-                    }
-                    else {
-                        console.log(refreshCount, "Hello")
-                    } */
-            } catch (error) {
-                console.error("Error fetching JSON feed:", error);
-            }
-            /* try {
-                const response = await fetch("https://example-json-stream.accounts8547.workers.dev/").then((response) => response.text());
-                setAllItems(JSON.parse(response).items)
-            } catch (error) {
-                console.error("Error fetching JSON feed:", error);
-            } */
-        }
-        getJSON();
-        
-    }, [refreshCount]) // here I can add a thing if "submitted new item, or changed order has happened"
 
     useEffect(() => {
         if (allItems && !refreshCount) {
@@ -309,7 +285,7 @@ const Stream = () => {
                                                                     </div>
                                                             </div>
                                                     <div {...useSwipeable({onSwiping: (e) => {setSwipingX({index: index, value: e.deltaX})}, onSwiped: (e) => {handleOnSwiped(e, index)}})}
-                                                        className={`flex bg-secondary p-6 pl-8 border-b border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''} ${allItems[index]?.done ? 'text-primary-100' : ''}`}
+                                                        className={`flex bg-secondary p-6 pl-8 border-b border-t border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''} ${allItems[index]?.done ? 'text-primary-100' : ''}`}
                                                         style={{ transform: "translateX(" + (swipingX.index == index ? swipingX.value : 0) + "px)"}}
                                                     >
                                                         <div className='flex items-center mr-4'>

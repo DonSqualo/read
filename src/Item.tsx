@@ -1,26 +1,40 @@
-import { useContext, useState } from "react";
-import { AllItemsContext } from "./AllItemsContext";
+import { useContext, useState, useEffect } from "react";
+import { AllItemsContext, MeaningItem } from "./AllItemsContext";
 import { useSwipeable } from "react-swipeable";
 import { useNavigate } from "react-router-dom";
 import Icon from "./components/Icon";
 import { AuthContext } from './AuthContext';
 import {backendPath} from "./consts/constants.ts"
+import { useParams } from "react-router-dom";
+
 
 const Item = () => {
     const { allItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
     const navigate = useNavigate();
     const [isHidden, setHidden] = useState(true);
     const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
+    const currentId = useParams().id;
+    //const [thisItem, setThisItem] = useState<MeaningItem>()
+    useEffect(() => {
+        if (allItems) {
+            console.log(currentId)
+            //setThisItem(allItems.find(item => item.uid === currentId));
+            setCurrentItem(allItems.findIndex(item => item.uid === currentId));
+            //console.log(thisItem)
+        }
+    }, [allItems, currentId])
 
     const swipedLeft = () => {
-        currentItem < (allItems.length - 1) ? setCurrentItem(currentItem + 1) : setCurrentItem(0);
-        navigate('/item/' + allItems[currentItem].uid)
+        const idx = currentItem
+        //currentItem < (allItems.length - 1) ? setCurrentItem(currentItem + 1) : setCurrentItem(0);
+        idx < (allItems.length - 1) ? navigate('/item/' + allItems[idx + 1].uid) : navigate('/item/' + allItems[0].uid);
+        //navigate('/item/' + allItems[currentItem].uid)
         window.scrollTo(0, 0);
         //window.history.replaceState(null, "New Page Title", "/item/" + allItems[currentItem].uuid)
     }
     const swipedRight = () => {
-        currentItem > 0 ? setCurrentItem(currentItem - 1) : setCurrentItem(allItems.length - 1);
-        navigate('/item/' + allItems[currentItem].uid)
+        const idx = currentItem
+        idx > 0 ? navigate('/item/' + allItems[idx - 1].uid) : navigate('/item/' + allItems[allItems.length - 1].uid);
         window.scrollTo(0, 0);
     }
     const swipedDown = () => {
@@ -79,10 +93,10 @@ const Item = () => {
         onSwipedDown: swipedDown,
     });
     
-    var date = allItems[currentItem]?.created_at // should be an actual Date newDate().toDateString()
+    //var date =  // should be an actual Date newDate().toDateString()
     return (
         <>
-
+{allItems ? 
             <div {...handlers} id="current-card" className="w-full">
                 <div className="h-screen flex items-center justify-center px-8 flex-wrap text-center">
                     <div className="w-full"></div>
@@ -98,7 +112,7 @@ const Item = () => {
                     <div className="text-right w-full mb-5 self-end text-primary">
                         <div onClick={() => {setHidden(!isHidden)}}>{isHidden ? "i" : "v"}</div>
                         <div className={`${isHidden ? "hidden" : ''}`}>
-                        {date}<br></br>
+                        {allItems[currentItem]?.created_at}<br></br>
 {/*                         <span className="opacity-60">From</span> {allItems[currentItem]?.views[0].viewer}: {allItems[currentItem]?.views[0].comment} 
  */}                        </div>
                     </div>
@@ -114,6 +128,7 @@ const Item = () => {
                     ></iframe>
                 : ''}
             </div>
+            : ""}
         </>
     );
 };
