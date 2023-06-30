@@ -1,1 +1,1 @@
-export const backendPath = "https://ce43-165-232-120-133.eu.ngrok.io" /* "http://localhost:8080" */
+export const backendPath = "https://spile.withmeaning.io" /* "http://localhost:8080" */
