@@ -1,5 +1,6 @@
 import { Dispatch, ReactElement, SetStateAction, createContext, useMemo, useState, useEffect } from "react";
 import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
 
 export interface AuthTokenContext {
     authToken: string;
@@ -25,11 +26,11 @@ export function AuthProvider ({ children }: {children: ReactElement}) {
 		() => ({ authToken, setAuthToken, refreshCount, setRefreshCount }),
 		[authToken, refreshCount]
 	);
+    const navigate = useNavigate();
+
     useEffect(() => {
         const key = Cookies.get('meaning_user_key')
         if (!key) {
-          // redirect user back to login page, 
-          // or handle the missing key error in some other ways
           navigate("/");
         }
         else {

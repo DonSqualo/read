@@ -10,7 +10,6 @@ import archiveGif from './assets/icons8-verified-scroll.gif'
 import laterGif from './assets/icons8-time.gif'
 import { useNavigate } from "react-router-dom";
 import {backendPath} from "./consts/constants.ts";
-import Cookies from 'js-cookie';
 
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
     const [enabled, setEnabled] = useState(false);
@@ -46,7 +45,7 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 const Stream = () => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
     const [swipingX, setSwipingX] = useState({index: 0, value: 0});
-    const { authToken, setAuthToken, refreshCount, setRefreshCount } = useContext(AuthContext);
+    const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
     const navigate = useNavigate();
 
 /*     useEffect(() => {

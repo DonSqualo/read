@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { AllItemsContext, MeaningItem } from "./AllItemsContext";
+import { AllItemsContext } from "./AllItemsContext";
 import { useSwipeable } from "react-swipeable";
 import { useNavigate } from "react-router-dom";
 import Icon from "./components/Icon";
