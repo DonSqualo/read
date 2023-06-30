@@ -1,1 +1,1 @@
-export const backendPath = "https://7a02-165-232-120-133.eu.ngrok.io" /* "http://localhost:8080" */
+export const backendPath = "https://ce43-165-232-120-133.eu.ngrok.io" /* "http://localhost:8080" */
