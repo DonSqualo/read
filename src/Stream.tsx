@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom';
 import { AllItemsContext } from './AllItemsContext';
 import { AuthContext } from './AuthContext';
 import { DragDropContext, Droppable, Draggable, DroppableProps } from "react-beautiful-dnd";
-import { useSwipeable } from 'react-swipeable';
 import NewItem from './NewItem';
 import Icon from './components/Icon';
-import archiveGif from './assets/icons8-verified-scroll.gif'
-import laterGif from './assets/icons8-time.gif'
+import AnimatedBackground from './components/AnimatedBackground';
 import { useNavigate } from "react-router-dom";
-import {backendPath} from "./consts/constants.ts";
+import { backendPath } from "./consts/constants.ts";
+
 
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
     const [enabled, setEnabled] = useState(false);
@@ -44,22 +43,21 @@ export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
 } */
 const Stream = () => {
     const { allItems, setAllItems, currentItem, setCurrentItem } = useContext(AllItemsContext);
-    const [swipingX, setSwipingX] = useState({index: 0, value: 0});
     const { authToken, refreshCount, setRefreshCount } = useContext(AuthContext);
     const navigate = useNavigate();
 
-/*     useEffect(() => {
-        const key = Cookies.get('meaning_user_key')
-        if (!key) {
-          // redirect user back to login page, 
-          // or handle the missing key error in some other ways
-          navigate("/");
-        }
-        else {
-            console.log(key)
-           setAuthToken(key);
-        }
-    }, []) */
+    /*     useEffect(() => {
+            const key = Cookies.get('meaning_user_key')
+            if (!key) {
+              // redirect user back to login page, 
+              // or handle the missing key error in some other ways
+              navigate("/");
+            }
+            else {
+                console.log(key)
+               setAuthToken(key);
+            }
+        }, []) */
     //const [feedItems, setFeedItems] = useState<MeaningItem[]>([]);
     /* useEffect(() => {
         const fetchFeed = async () => {
@@ -104,13 +102,13 @@ const Stream = () => {
         width: 250*/
     });
 
-    
+
     const reorder = (list: any, startIndex: any, endIndex: any) => {
         const result = Array.from(list);
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
-        
-        
+
+
         return result;
     };
     interface orderItem {
@@ -131,7 +129,7 @@ const Stream = () => {
                 headers: headers,
                 body: JSON.stringify(order),
             };
-        
+
             await fetch(backendPath + "/order", requestOptions)
             setRefreshCount((refreshCount: number) => refreshCount + 1);
         } catch (error) {
@@ -148,13 +146,14 @@ const Stream = () => {
             result.source.index,
             result.destination.index
         );
-        var orderedArray: Order = {items: 
-            newlySortedItems.map((element: any, index) => ({order: index, uid: element.uid}))
+        var orderedArray: Order = {
+            items:
+                newlySortedItems.map((element: any, index) => ({ order: index, uid: element.uid }))
         };
-        
+
         /* allItems.map
         orderedArray.items.push({order: 2, uid: ""}) */
-        
+
         console.log(allItems[0].done)
         setAllItems(newlySortedItems)
         order(orderedArray)
@@ -174,7 +173,7 @@ const Stream = () => {
                     "done": bool,
                 }),
             };
-        
+
             await fetch(backendPath + "/done", requestOptions)
             setRefreshCount(refreshCount + 1);
         } catch (error) {
@@ -210,27 +209,29 @@ const Stream = () => {
                     "archived": bool,
                 }),
             };
-        
+
             await fetch(backendPath + "/archive", requestOptions)
             setRefreshCount(refreshCount + 1);
         } catch (error) {
             console.error("Error marking item as archived", error);
         }
     }
-    const handleOnSwiped = (event: any, index: number) => {
-        if (event.deltaX > 100) {
-            console.log("later")
+
+    const swipedRight = (deltaX: number) => {
+        if (deltaX > 100) {
+            console.log("Hello")
         }
-        if (event.deltaX < -100) {
+    }
+    const swipedLeft = (index: number, deltaX: number) => {
+        if (deltaX < -100) {
             console.log(!allItems[index]?.archived)
             archive(index, !allItems[index]?.archived)
         }
-        setSwipingX({index: index, value: 0})
     }
 
-/*     const handlers = useSwipeable({
-        onSwiping: () => {console.log("hello")}
-    }); */
+    /*     const handlers = useSwipeable({
+            onSwiping: () => {console.log("hello")}
+        }); */
 
     /* const bgImage = {
         background: rgba(0, 0, 0, .65) url('https://res.cloudinary.com/deepwave-org/image/upload/c_scale,w_2000/v1680756160/Heye.earth/Projects/withmeaning/withmeaning_mfwwc7.webp');
@@ -262,54 +263,31 @@ const Stream = () => {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                
-                                                    <div style={{ background: 'rgba(0, 0, 0, .65) url("https://res.cloudinary.com/deepwave-org/image/upload/c_scale,w_2000/v1680756160/Heye.earth/Projects/withmeaning/withmeaning_mfwwc7.webp")', 
-                                                    backgroundBlendMode: "darken", 
-                                                    backgroundSize: "200%",
-                                                    backgroundPosition: (swipingX.index == index ? 
-                                                        (
-                                                            swipingX.value > (window.outerWidth / 1.5) ? window.outerWidth / 1.3 : 
-                                                                swipingX.value < (- window.outerWidth / 1.6) ? 50 : 
-                                                                    (- swipingX.value / 1.5) + (swipingX.value > 0 ? window.outerWidth * 1.2 : - window.outerWidth / 3)
-                                                        )
-                                                        : 0) + "px"}}>
-                                                            <div className="absolute w-full h-full flex justify-between items-center">
-                                                            <div className="pl-6 pt-1 flex justify-center items-center flex-col">
-                                                                    <img src={laterGif} className="invert mix-blend-lighten h-8 w-8" />
-                                                                    <div className="text-lg">Later</div>
-                                                                    </div>
-                                                                <div className="pr-6 pt-1 flex justify-center items-center flex-col">
-                                                                    <img src={archiveGif} className="invert mix-blend-lighten h-8 w-8" />
-                                                                    <div className="text-lg">Archive</div>
-                                                                    </div>
-                                                            </div>
-                                                    <div {...useSwipeable({onSwiping: (e) => {setSwipingX({index: index, value: e.deltaX})}, onSwiped: (e) => {handleOnSwiped(e, index)}})}
-                                                        className={`flex bg-secondary p-6 pl-8 border-b border-t border-primary-100 cursor-pointer ${index < currentItem ? 'text-primary-100' : ''} ${allItems[index]?.done ? 'text-primary-100' : ''}`}
-                                                        style={{ transform: "translateX(" + (swipingX.index == index ? swipingX.value : 0) + "px)"}}
-                                                    >
+                                                <AnimatedBackground index={index} swipedLeft={swipedLeft} swipedRight={swipedRight} size="200%">
+                                                    <div className={`
+                                                        flex bg-secondary p-6 pl-8 border-b border-t border-primary-100 cursor-pointer
+                                                        ${index < currentItem ? 'text-primary-100' : ''} ${allItems[index]?.done ? 'text-primary-100' : ''}`}>
                                                         <div className='flex items-center mr-4'>
-                                                            <button onClick={() => {handleDone(index, item.done || false)}}>
-                                                                <Icon type={item.type} state={item.done || false} size={8}/>
+                                                            <button onClick={() => { handleDone(index, item.done || false) }}>
+                                                                <Icon type={item.type} state={item.done || false} size={8} />
                                                             </button>
                                                         </div>
                                                         <Link to={`/item/${item.uid}`} state={item} onClick={() => {
-                                                    setCurrentItem(index);
-                                                    window.scrollTo(0, 0);
-                                                }} className="w-full">
-                                                        <div className='max-w-[80%] pt-1'>
-                                                            <h2 className="text-xl font-semibold">
-                                                                {item.title}
-                                                            </h2>
-                                                            {item.author ? 
-                                                            <div className='text-base'>
-                                                                <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'></span> {/* recommended by</span> {item.views[0]?.viewer} */}
-                                                            </div> : ""}
-                                                        </div>
-                                                        
-                                                </Link>
+                                                            setCurrentItem(index);
+                                                            window.scrollTo(0, 0);
+                                                        }} className="w-full">
+                                                            <div className='max-w-[80%] pt-1'>
+                                                                <h2 className="text-xl font-semibold">
+                                                                    {item.title}
+                                                                </h2>
+                                                                {item.author ?
+                                                                    <div className='text-base'>
+                                                                        <span className='opacity-60'>from</span> {item.author} <span className='opacity-60'></span> {/* recommended by</span> {item.views[0]?.viewer} */}
+                                                                    </div> : ""}
+                                                            </div>
+                                                        </Link>
                                                     </div>
-                                                    
-                                                    </div>
+                                                </AnimatedBackground>
                                             </div>
                                         )}
                                     </Draggable>

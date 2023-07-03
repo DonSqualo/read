@@ -6,6 +6,7 @@ import Icon from "./components/Icon";
 import { AuthContext } from './AuthContext';
 import {backendPath} from "./consts/constants.ts"
 import { useParams } from "react-router-dom";
+import AnimatedBackground from "./components/AnimatedBackground.tsx";
 
 
 const Item = () => {
@@ -24,21 +25,71 @@ const Item = () => {
         }
     }, [allItems, currentId])
 
-    const swipedLeft = () => {
+    const addResonance = async (resonance: number, item_uid: string) => {
+        try {
+            const headers = new Headers();
+            headers.append("auth_token", authToken);
+            headers.append("Accept", 'application/json');
+            headers.append("Content-Type", 'application/json');
+    
+            const requestOptions = {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify({
+                    "content": resonance,
+                    "link": item_uid,
+                    "type": "resonance",
+                }),
+            };
+        
+            await fetch(backendPath + "/add_item", requestOptions);
+            setRefreshCount(refreshCount + 1)
+            
+        } catch (error) {
+            console.error("Error adding item", error);
+        }
+    }
+
+    const nextItem = (deltaX: number, confirmedResonance: boolean) => {
+        var percentageSwiped = deltaX / window.outerWidth;
+        // do this with this cool mapping function from Math
+        percentageSwiped = Math.floor(percentageSwiped * 50) + 50
+        percentageSwiped > 100 ? percentageSwiped = 100 : percentageSwiped
+        percentageSwiped < 0 ? percentageSwiped = 0 : percentageSwiped
+        console.log(percentageSwiped)
+        confirmedResonance ? addResonance(percentageSwiped, allItems[currentItem].uid) : ""
         const idx = currentItem
-        //currentItem < (allItems.length - 1) ? setCurrentItem(currentItem + 1) : setCurrentItem(0);
         idx < (allItems.length - 1) ? navigate('/item/' + allItems[idx + 1].uid) : navigate('/item/' + allItems[0].uid);
-        //navigate('/item/' + allItems[currentItem].uid)
-        window.scrollTo(0, 0);
+
+    }
+
+    const swipedRight = (deltaX: number) => {
+        if (deltaX > 100 ) { // small range in wich the swipe is cancelled
+
+            // navigate to the next item
+            nextItem(deltaX, true)
+
+            //const idx = currentItem
+            //idx > 0 ? navigate('/item/' + allItems[idx - 1].uid) : navigate('/item/' + allItems[allItems.length - 1].uid);
+            window.scrollTo(0, 0);
+        }
+    }
+    const swipedLeft = (index: number, deltaX: number) => {
+        index
+        console.log(deltaX / window.outerWidth + "%")
+        if (deltaX < -100 ) {    
+            nextItem(deltaX, true)
+            //const idx = currentItem
+            //currentItem < (allItems.length - 1) ? setCurrentItem(currentItem + 1) : setCurrentItem(0);
+            //idx < (allItems.length - 1) ? navigate('/item/' + allItems[idx + 1].uid) : navigate('/item/' + allItems[0].uid);
+            //navigate('/item/' + allItems[currentItem].uid)
+            window.scrollTo(100, 0);
+        }
         //window.history.replaceState(null, "New Page Title", "/item/" + allItems[currentItem].uuid)
     }
-    const swipedRight = () => {
-        const idx = currentItem
-        idx > 0 ? navigate('/item/' + allItems[idx - 1].uid) : navigate('/item/' + allItems[allItems.length - 1].uid);
-        window.scrollTo(0, 0);
-    }
-    const swipedDown = () => {
-        if (window.scrollY == 0) {
+    
+    const swipedDown = (event: any) => {
+        if (window.scrollY == 0 && event.deltaX < 10 && event.deltaX > -10) {
             navigate('/stream');
             window.scrollTo(0, 0);
         }
@@ -87,18 +138,24 @@ const Item = () => {
     // TILL HERE REFACTOR
 
 
-    const handlers = useSwipeable({
-        onSwipedLeft: swipedLeft,
-        onSwipedRight: swipedRight,
+    const topHandler = useSwipeable({
         onSwipedDown: swipedDown,
     });
-    
+    const tapHandler = useSwipeable({
+        onTap: () => {nextItem(0, false)}
+    });
+    const tapHandler2 = useSwipeable({
+        onTap: () => {nextItem(0, false)}
+    });
+
     //var date =  // should be an actual Date newDate().toDateString()
     return (
         <>
-{allItems ? 
-            <div {...handlers} id="current-card" className="w-full">
-                <div className="h-screen flex items-center justify-center px-8 flex-wrap text-center">
+{allItems ?                                                 
+    <AnimatedBackground index={0} swipedLeft={swipedLeft} swipedRight={swipedRight} size="cover">
+            <div {...topHandler} id="current-card" className="w-full bg-secondary">
+                <div className="h-screen flex flex-col items-center justify-center px-8 flex-wrap text-center">
+                    <div {...tapHandler2} className="w-full flex-grow"></div>
                     <div className="w-full"></div>
                     <div>
                         <h1 className="text-5xl py-4">{allItems[currentItem]?.title}</h1>
@@ -109,7 +166,9 @@ const Item = () => {
                         </button>
                         : ""}
                     </div>
-                    <div className="text-right w-full mb-5 self-end text-primary">
+                    <div {...tapHandler} className="flex-grow w-full">
+                    </div>
+                    <div className="text-right w-full mb-5 justify-end text-primary">
                         <div onClick={() => {setHidden(!isHidden)}}>{isHidden ? "i" : "v"}</div>
                         <div className={`${isHidden ? "hidden" : ''}`}>
                         {allItems[currentItem]?.created_at}<br></br>
@@ -118,7 +177,7 @@ const Item = () => {
                     </div>
                 </div>
                 {allItems[currentItem]?.summary ? <div>{allItems[currentItem]?.summary}</div> : ''}
-                {allItems[currentItem]?.content ? <div className="mb-6 w-[90%] mx-auto text-xl relative">{allItems[currentItem]?.content}</div> : ''}
+                {allItems[currentItem]?.content ? <div className="pb-6 w-[90%] mx-auto text-xl relative">{allItems[currentItem]?.content}</div> : ''}
                 {allItems[currentItem]?.link ? 
                     <iframe className="mx-auto -mt-3 h-screen"
                         title="My iframe example"
@@ -127,7 +186,8 @@ const Item = () => {
                         src={allItems[currentItem]?.link}
                     ></iframe>
                 : ''}
-            </div>
+                </div>
+            </AnimatedBackground>
             : ""}
         </>
     );
