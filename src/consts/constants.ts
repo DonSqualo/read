@@ -1,1 +1,1 @@
-export const backendPath = /* "https://spile.withmeaning.io" */ "http://localhost:8080"
+export const backendPath =  "https://spile.withmeaning.io" // should really build a .env thingy "http://localhost:8080"
