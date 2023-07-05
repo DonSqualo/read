@@ -1,0 +1,17 @@
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  sendRequest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Issue to withmeaning
+        run: >
+          curl -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: "61b96d40-6b78-4789-bc30-5ec7d57b3bbd"' -d '{
+            {
+            "title": "${{ github.event.issue.title }}",
+            "content": "${{ github.event.issue.body }}",
+            "link": "${{ github.event.repository.html_url }}",
+            "author": "${{ github.event.issue.user.login }}"
+            "type": "do",}'
