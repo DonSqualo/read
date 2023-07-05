@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Send API Request
         run: |
-          CONTENT=$(echo '${{ github.event.issue.body }}' | jq -R -s .)
+          CONTENT=$(printf '%s\n' "${{ github.event.issue.body }}"s | jq -R -s .)
           curl -s -o /dev/null -w "%{http_code}" -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d "{
             \"title\": \"${{ github.event.issue.title }}\",
             \"content\": $CONTENT,
