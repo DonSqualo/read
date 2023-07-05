@@ -9,9 +9,8 @@ jobs:
       - name: Send Issue to withmeaning
         run: >
           curl -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d '{
-            {
             "title": "${{ github.event.issue.title }}",
             "content": "${{ github.event.issue.body }}",
             "link": "${{ github.event.repository.html_url }}",
-            "author": "${{ github.event.issue.user.login }}"
+            "author": "${{ github.event.issue.user.login }}",
             "type": "do"}'
