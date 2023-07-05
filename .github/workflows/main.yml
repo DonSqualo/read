@@ -6,15 +6,18 @@ jobs:
   sendRequest:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Issue to withmeaning
+      - name: Send API Request
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d '{
-            "title": "${{ github.event.issue.title }}",
-            "content": "${{ github.event.issue.body }}",
-            "link": "${{ github.event.repository.html_url }}",
-            "author": "${{ github.event.issue.user.login }}",
-            "type": "do"}')
-          if [ "$response" -ne 200 ]; then
-            echo "API request failed with HTTP status $response"
-            exit 1
-          fi
+          CONTENT=$(echo '${{ github.event.issue.body }}' | jq -R -s .)
+          curl -s -o /dev/null -w "%{http_code}" -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d "{
+            \"title\": \"${{ github.event.issue.title }}\",
+            \"content\": $CONTENT,
+            \"link\": \"${{ github.event.repository.html_url }}\",
+            \"author\": \"${{ github.event.issue.user.login }}\",
+            \"type\": \"do\"}" | {
+              read response
+              if [ "$response" -ne 200 ]; then
+                echo "API request failed with HTTP status $response"
+                exit 1
+              fi
+          }
