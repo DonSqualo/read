@@ -9,15 +9,14 @@ jobs:
       - name: Send API Request
         run: |
           CONTENT=$(printf '%s\n' "${{ github.event.issue.body }}"s | jq -R -s .)
-          curl -s -o /dev/null -w "%{http_code}" -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d "{
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST 'https://spile.withmeaning.io/add_item' -H 'Content-Type: application/json' -H 'auth_token: ${{ secrets.AUTH_TOKEN }}' -d "{
             \"title\": \"${{ github.event.issue.title }}\",
             \"content\": $CONTENT,
             \"link\": \"${{ github.event.repository.html_url }}\",
             \"author\": \"${{ github.event.issue.user.login }}\",
-            \"type\": \"do\"}" | {
-              read response
-              if [ "$response" -ne 200 ]; then
-                echo "API request failed with HTTP status $response"
-                exit 1
-              fi
-          }
+            \"type\": \"do\"}")
+          echo $RESPONSE
+          if [ "$RESPONSE" -ne 200 ]; then
+            echo "API request failed with HTTP status $RESPONSE"
+            exit 1
+          fi
