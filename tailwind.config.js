@@ -23,6 +23,7 @@ export default {
         'primary': 'white',
         'primary-100': '#333333',
         'secondary': 'black',
+        'link': '#bbc7ef',
       },
       'space-grey': {
         'primary': 'white',

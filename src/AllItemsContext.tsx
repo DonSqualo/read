@@ -10,6 +10,8 @@ export interface MeaningItem extends Item {
     type: string;
     done?: boolean;
     archived?: boolean;
+    iframe?: boolean;
+    url_title?: string;
 }
 
 export interface ItemsContext {

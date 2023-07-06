@@ -20,7 +20,21 @@ body {
   background: black
 }
 
-
+.markdown h1, .markdown h2, .markdown h3, .markdown p {
+  padding-bottom: 1rem;
+}
+.markdown h1 {
+  font-size: 170%;
+}
+.markdown h2 {
+  font-size: 150%;
+}
+.markdown h3 {
+  font-size: 130%;
+}
+.markdown a {
+  color: #bbc7ef;
+}
 /* button {
   border-radius: 8px;
   border: 1px solid transparent;

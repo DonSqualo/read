@@ -7,6 +7,8 @@ import { AuthContext } from './AuthContext';
 import {backendPath} from "./consts/constants.ts"
 import { useParams } from "react-router-dom";
 import AnimatedBackground from "./components/AnimatedBackground.tsx";
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 
 const Item = () => {
@@ -24,7 +26,6 @@ const Item = () => {
             //console.log(thisItem)
         }
     }, [allItems, currentId])
-
     const addResonance = async (resonance: number, item_uid: string) => {
         try {
             const headers = new Headers();
@@ -176,16 +177,21 @@ const Item = () => {
  */}                        </div>
                     </div>
                 </div>
-                {allItems[currentItem]?.summary ? <div>{allItems[currentItem]?.summary}</div> : ''}
-                {allItems[currentItem]?.content ? <div className="pb-6 w-[90%] mx-auto text-xl relative">{allItems[currentItem]?.content}</div> : ''}
-                {allItems[currentItem]?.link ? 
-                    <iframe className="mx-auto -mt-3 h-screen"
-                        title="My iframe example"
-                        width="90%"
-                        height="100%"
-                        src={allItems[currentItem]?.link}
-                    ></iframe>
-                : ''}
+                <div className="w-[90%] mx-auto text-xl relative pb-6">
+                    {allItems[currentItem]?.summary ? <div>{allItems[currentItem]?.summary}</div> : ''}
+                    {allItems[currentItem]?.content ? <div className="pb-6"><ReactMarkdown className="markdown" children={allItems[currentItem].content || "" } remarkPlugins={[remarkGfm]} /></div> : ''}
+                    {allItems[currentItem]?.iframe ? 
+                        <iframe className="mx-auto -mt-3 h-screen pb-6"
+                            title="My iframe example"
+                            width="100%"
+                            height="100%"
+                            src={allItems[currentItem]?.link}
+                        ></iframe>
+                    : ''}
+                    {allItems[currentItem]?.url_title ? 
+                        <><span className="text-primary-100">See also </span><a className="text-link" href={allItems[currentItem]?.link}>{allItems[currentItem]?.url_title}</a></>
+                    : (allItems[currentItem]?.link ? <><span className="text-primary-100">See also </span><a className="text-link" href={allItems[currentItem]?.link}>{allItems[currentItem]?.link}</a></>: '')}
+                </div>
                 </div>
             </AnimatedBackground>
             : ""}
